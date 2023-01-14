@@ -5,13 +5,16 @@ import java.nio.file.Path;
 public class FileDTO {
 
     private Path name;
-    private Path path;
+    private Path absolutePath;
+
+    private Path relativePath;
     private boolean isDirectory;
     private Long size;
 
-    public FileDTO(Path name, Path path, boolean isDirectory, Long size) {
+    public FileDTO(Path name, Path absolutePath, Path relativePath, boolean isDirectory, Long size) {
         this.name = name;
-        this.path = path;
+        this.absolutePath = absolutePath;
+        this.relativePath = relativePath;
         this.isDirectory = isDirectory;
         this.size = size;
     }
@@ -20,8 +23,12 @@ public class FileDTO {
         return name;
     }
 
-    public Path getPath() {
-        return path;
+    public Path getAbsolutePath() {
+        return absolutePath;
+    }
+
+    public Path getRelativePath() {
+        return relativePath;
     }
 
     public boolean isDirectory() {

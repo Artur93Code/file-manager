@@ -51,15 +51,22 @@ public class ExplorerService {
     }*/
 
     //Download all files and folders from the selected location and suit up them to the pre-created DTO format
-    public List<FileDTO> getFolderContent(String dir) throws IOException {
-        try (Stream<Path> stream = Files.list(Paths.get(dir))) {
+    public List<FileDTO> getFolderContent(String dir, String relativePath) throws IOException {
+        if(relativePath==null)
+            relativePath="\\";
+        try (Stream<Path> stream = Files.list(Paths.get(dir, relativePath))) {
             List<Path> contentListPath = stream.collect(Collectors.toList());
             List<FileDTO> contentListDTO = new ArrayList<>();
             for(Path path : contentListPath)
             {
+                Path pathAbsolute = Paths.get(dir+relativePath+"\\"+path.getFileName());
+                Path pathBase = Paths.get(dir);
+                Path pathRelative = pathBase.relativize(pathAbsolute);
+
                 contentListDTO.add(new FileDTO(
                         path.getFileName(),
-                        Paths.get(dir),
+                        pathAbsolute,
+                        pathRelative,
                         Files.isDirectory(path),
                         Files.size(path)));
 /*                System.out.println(path.getFileName());
