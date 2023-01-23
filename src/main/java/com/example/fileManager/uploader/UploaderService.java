@@ -12,9 +12,12 @@ public class UploaderService{
     private final String FOLDER_PATH = "\\\\192.168.1.207\\c$\\Users\\Artur\\Downloads\\Udostępnione\\Zdjęcia\\";
     //private final String FOLDER_PATH = "C:\\Users\\Artur\\Downloads\\Udostępnione\\Zdjęcia\\";
 
-    public void uplodad(MultipartFile file) throws IOException {
-        String filePath = FOLDER_PATH+file.getOriginalFilename();
-        System.out.println(filePath);
+    public void uplodad(MultipartFile file, String relativePath) throws IOException {
+        if(relativePath!=null){
+            relativePath=relativePath.concat("\\");
+        }
+
+        String filePath = FOLDER_PATH+relativePath+file.getOriginalFilename();
         file.transferTo(new File(filePath));
     }
 }

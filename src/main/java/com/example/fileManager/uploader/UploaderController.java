@@ -25,18 +25,22 @@ public class UploaderController {
     @GetMapping(value = {"/home","/home/{folderName}"})
     public ModelAndView getTestData(@RequestParam(required = false) String relative) {
         ModelAndView mv = new ModelAndView();
-        mv.setViewName("home");
 
-        //relativePath = folderName;
-/*        if(folderName!=null &&  relativePath+"\\"+folderName!=relativePath){
-            relativePath = relativePath+"\\"+folderName;
-        }*/
-
+        if(relative!=null && !relative.isEmpty())
+        {
+            Path path = Paths.get(relative);
+            Path parent = path.getParent();
+            mv.getModel().put("parent", parent);
+            System.out.println("Parent: "+parent);
+            System.out.println("Relative: "+relative);
+            mv.getModel().put("relative", relative);
+        }
 
         System.out.println(relative);
 
         String FOLDER_PATH = "\\\\192.168.1.207\\c$\\Users\\Artur\\Downloads\\Udostępnione\\Zdjęcia\\";
         try {
+            mv.setViewName("home");
             mv.getModel().put("files",explorerService.getFolderContent(FOLDER_PATH, relative));
 
 
@@ -50,7 +54,7 @@ public class UploaderController {
     }
 
     @PostMapping(path = "/upload")
-    public String uploadFile(@RequestParam("file") MultipartFile file, RedirectAttributes attributes) {
+    public String uploadFile(@RequestParam("file") MultipartFile file, RedirectAttributes attributes, @RequestParam(required = false) String relative) {
 
         // check if file is empty
         if (file.isEmpty()) {
@@ -59,7 +63,7 @@ public class UploaderController {
         }
 
         try{
-            uploaderService.uplodad(file);
+            uploaderService.uplodad(file, relative);
             attributes.addFlashAttribute("success", "Successfully upload file: "+file.getOriginalFilename());
         }
         catch (IOException e){};
