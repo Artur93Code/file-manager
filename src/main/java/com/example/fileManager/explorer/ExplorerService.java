@@ -78,4 +78,20 @@ public class ExplorerService {
         }
     }
 
+    public String createFolder(String folderPath, String relativePath) throws IOException
+    {
+        Path path = Paths.get(folderPath,relativePath);
+        if(!Files.exists(path)){
+            Files.createDirectory(path);
+            //System.out.println("Folder created!");
+            return "Folder created!";
+        }
+        else{
+            //System.out.println("Folder already exist");
+            throw new IOException("Folder already exist");
+            //return "Folder already exist";
+        }
+        //return "Folder created!";
+    }
+
 }
