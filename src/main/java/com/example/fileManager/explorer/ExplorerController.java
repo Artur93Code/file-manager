@@ -73,4 +73,24 @@ public class ExplorerController {
         mv.setViewName("redirect:/home");
         return mv;
     }
+
+    @PostMapping(value="/delete")
+    public ModelAndView delete(RedirectAttributes attributes, @RequestParam String name, @RequestParam String current, Model model){
+        ModelAndView mv = new ModelAndView();
+
+        try {
+            String folderRelativePath=current+"\\"+name;
+            explorerService.deleteFolderOrFile(FOLDER_PATH, folderRelativePath);
+            attributes.addFlashAttribute("success", "Folder "+name+" deleted!");
+
+            //model.addAttribute("files",explorerService.getFolderContent(FOLDER_PATH, relative));
+        }
+        catch (IOException e){
+            attributes.addFlashAttribute("error", e.getMessage());
+            //return "redirect:/home";
+        }
+        mv.getModel().put("relative", current);
+        mv.setViewName("redirect:/home");
+        return mv;
+    }
 }

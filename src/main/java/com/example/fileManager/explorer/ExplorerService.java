@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -78,19 +79,31 @@ public class ExplorerService {
         }
     }
 
-    public String createFolder(String folderPath, String relativePath) throws IOException
+    public void createFolder(String folderPath, String relativePath) throws IOException
     {
         Path path = Paths.get(folderPath,relativePath);
         if(!Files.exists(path)){
             Files.createDirectory(path);
             //System.out.println("Folder created!");
-            return "Folder created!";
+            //return "Folder created!";
         }
         else{
             //System.out.println("Folder already exist");
             throw new IOException("Folder already exist");
             //return "Folder already exist";
         }
+        //return "Folder created!";
+    }
+
+    public void deleteFolderOrFile(String folderPath, String relativePath) throws IOException
+    {
+        Path path = Paths.get(folderPath,relativePath);
+
+        Files.walk(path)
+                .sorted(Comparator.reverseOrder())
+                .map(Path::toFile)
+                .forEach(File::delete);
+
         //return "Folder created!";
     }
 
