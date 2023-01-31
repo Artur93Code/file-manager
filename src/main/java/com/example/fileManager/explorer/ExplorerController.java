@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -19,6 +20,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @Controller
 public class ExplorerController {
@@ -28,8 +32,39 @@ public class ExplorerController {
     @Autowired
     ExplorerService explorerService;
 
+    @GetMapping(value = {"/home","/home/{folderName}"})
+    public ModelAndView getTestData(@RequestParam(required = false) String relative) {
+        ModelAndView mv = new ModelAndView();
+
+        if(relative!=null && !relative.isEmpty())
+        {
+            Path path = Paths.get(relative);
+            Path parent = path.getParent();
+            mv.getModel().put("parent", parent);
+            System.out.println("Parent: "+parent);
+            System.out.println("Relative: "+relative);
+            mv.getModel().put("relative", relative);
+        }
+
+        System.out.println(relative);
+
+        String FOLDER_PATH = "\\\\192.168.1.207\\c$\\Users\\Artur\\Downloads\\Udostępnione\\Zdjęcia\\";
+        try {
+            mv.setViewName("home");
+            mv.getModel().put("files",explorerService.getFolderContent(FOLDER_PATH, relative));
+
+
+
+            //mv.getModel().put("relative", relativePath);
+            //System.out.println(explorerService.getFolderContent(FOLDER_PATH));
+
+        }
+        catch (IOException e){}
+        return mv;
+    }
+
     @GetMapping(value = "/get-file" /*produces = MediaType.APPLICATION_OCTET_STREAM_VALUE*/)
-    public @ResponseBody ResponseEntity<Resource> getFile(@RequestParam(required = false) String relative) throws IOException {
+    public @ResponseBody ResponseEntity<Resource> downloadFile(@RequestParam(required = false) String relative) throws IOException {
 
         File file = new File("c:\\Users\\Artur\\Downloads\\Udostępnione\\Zdjęcia\\"+relative);
         Path path = Paths.get(file.getAbsolutePath());
@@ -52,6 +87,36 @@ public class ExplorerController {
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(resource);
 
+    }
+
+    @PostMapping(path = "/upload")
+    public String uploadFile(@RequestParam("file") MultipartFile[] files, RedirectAttributes attributes, @RequestParam(required = false) String relative) {
+
+        List<String> uploadedFilesNames = new ArrayList<>();
+
+        // check if file is empty
+        if (files.length==0) {
+            attributes.addFlashAttribute("error", "File is empty");
+            return "redirect:/home";
+        }
+
+        //try{
+
+            Arrays.asList(files).stream().forEach(file -> {
+                try {
+                    explorerService.uplodad(file, relative);
+                    uploadedFilesNames.add(file.getOriginalFilename());
+                }
+                catch (IOException e){
+                    System.out.println(e);
+                }
+            });
+
+
+            attributes.addFlashAttribute("success", "Successfully upload file(s): "+uploadedFilesNames);
+        //}
+        //catch (IOException e){};
+        return "redirect:/home";
     }
 
     @PostMapping(value="/create")

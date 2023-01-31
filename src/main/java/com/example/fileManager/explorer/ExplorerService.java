@@ -2,6 +2,7 @@ package com.example.fileManager.explorer;
 
 import com.example.fileManager.file.FileDTO;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,36 +21,8 @@ public class ExplorerService {
 
     FileDTO fileDTO;
 
-/*    public Set<String> getFolderContent(String dir) throws IOException {
-        try (Stream<Path> stream = Files.list(Paths.get(dir))) {
-            return stream
-                    .filter(file -> !Files.isDirectory(file))
-                    .map(Path::getFileName)
-                    .map(Path::toString)
-                    .collect(Collectors.toSet());
-        }
-    }*/
+    private final String FOLDER_PATH = "\\\\192.168.1.207\\c$\\Users\\Artur\\Downloads\\Udostępnione\\Zdjęcia\\";
 
-/*    public Set<File> getFolderContent(String dir) throws IOException {
-            Set<File> files = Files.list(Paths.get(dir))
-                    .map(Path::toFile)
-                    .filter(File::isFile)
-                    .collect(Collectors.toSet());
-            File file = files.stream().toList().get(0);
-            //files.size();
-        System.out.println(file);
-            return files;
-    }*/
-
-/*    public List<String> getFolderContent(String dir) throws IOException {
-        try (Stream<Path> stream = Files.list(Paths.get(dir))) {
-            return stream
-                    .filter(file -> !Files.isDirectory(file))
-                    .map(Path::getFileName)
-                    .map(Path::toString)
-                    .collect(Collectors.toList());
-        }
-    }*/
 
     //Download all files and folders from the selected location and suit up them to the pre-created DTO format
     public List<FileDTO> getFolderContent(String dir, String relativePath) throws IOException {
@@ -105,6 +78,17 @@ public class ExplorerService {
                 .forEach(File::delete);
 
         //return "Folder created!";
+    }
+
+    public void uplodad(MultipartFile file, String relativePath) throws IOException
+    {
+
+        if(relativePath!=null){
+            relativePath=relativePath.concat("\\");
+        }
+
+        String filePath = FOLDER_PATH+relativePath+file.getOriginalFilename();
+        file.transferTo(new File(filePath));
     }
 
 }

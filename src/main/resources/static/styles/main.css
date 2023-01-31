@@ -1,0 +1,21 @@
+h2 {
+    font-family: sans-serif;
+    font-size: 1.5em;
+    text-transform: uppercase;
+}
+
+body {
+  background: url('../images/background-image.jpg') no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    height: 100%;
+    overflow: visible;
+}
+
+.file-list {
+    overflow: hidden;
+    background-color: blue;
+
+}
