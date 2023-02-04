@@ -113,7 +113,7 @@ public class ExplorerController {
             });
 
 
-            attributes.addFlashAttribute("success", "Successfully upload file(s): "+uploadedFilesNames);
+            attributes.addFlashAttribute("success", "Successfully upload file(s): "+String.join(", ", uploadedFilesNames));
         //}
         //catch (IOException e){};
         return "redirect:/home";
