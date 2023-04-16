@@ -1,5 +1,7 @@
 package com.example.fileManager.explorer;
 
+import com.example.fileManager.config.ConfigDTO;
+import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -27,13 +29,21 @@ import java.util.List;
 @Controller
 public class ExplorerController {
 
-    private final String FOLDER_PATH = "\\\\192.168.1.207\\c$\\Users\\Artur\\Downloads\\Udostępnione\\Zdjęcia\\";
+    ConfigDTO configDTO = new ConfigDTO();
+
+    //private final String FOLDER_PATH = "\\\\192.168.1.207\\c$\\Users\\Artur\\Downloads\\Udostępnione\\Zdjęcia\\";
+    private final String FOLDER_PATH = configDTO.getConfig().get("rootFolder").toString();
 
     @Autowired
     ExplorerService explorerService;
 
+    //neceessary for FOLDER_PATH String
+    public ExplorerController() throws JSONException, IOException {
+    }
+
+
     @GetMapping(value = {"/home","/home/{folderName}"})
-    public ModelAndView getTestData(@RequestParam(required = false) String relative) {
+    public ModelAndView getFolderContent(@RequestParam(required = false) String relative) {
         ModelAndView mv = new ModelAndView();
 
         if(relative!=null && !relative.isEmpty())
@@ -46,10 +56,11 @@ public class ExplorerController {
             mv.getModel().put("relative", relative);
         }
 
-        System.out.println(relative);
+        System.out.println("Relative path: "+relative);
 
-        String FOLDER_PATH = "\\\\192.168.1.207\\c$\\Users\\Artur\\Downloads\\Udostępnione\\Zdjęcia\\";
+        //String FOLDER_PATH = "\\\\192.168.1.207\\c$\\Users\\Artur\\Downloads\\Udostępnione\\Zdjęcia\\";
         try {
+
             mv.setViewName("home");
             mv.getModel().put("files",explorerService.getFolderContent(FOLDER_PATH, relative));
 

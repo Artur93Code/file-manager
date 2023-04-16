@@ -1,6 +1,8 @@
 package com.example.fileManager.explorer;
 
+import com.example.fileManager.config.ConfigDTO;
 import com.example.fileManager.file.FileDTO;
+import org.json.JSONException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,7 +23,14 @@ public class ExplorerService {
 
     FileDTO fileDTO;
 
-    private final String FOLDER_PATH = "\\\\192.168.1.207\\c$\\Users\\Artur\\Downloads\\Udostępnione\\Zdjęcia\\";
+    ConfigDTO configDTO = new ConfigDTO();
+
+    //private final String FOLDER_PATH = "\\\\192.168.1.207\\c$\\Users\\Artur\\Downloads\\Udostępnione\\Zdjęcia\\";
+    private final String FOLDER_PATH = configDTO.getConfig().get("rootFolder").toString();
+
+    //neceessary for FOLDER_PATH String
+    public ExplorerService() throws JSONException, IOException {
+    }
 
 
     //Download all files and folders from the selected location and suit up them to the pre-created DTO format
