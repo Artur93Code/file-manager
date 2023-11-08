@@ -3,6 +3,8 @@ package com.example.fileManager.explorer;
 import com.example.fileManager.config.ConfigDTO;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -17,6 +19,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -32,7 +35,13 @@ public class ExplorerController {
     ConfigDTO configDTO = new ConfigDTO();
 
     //private final String FOLDER_PATH = "\\\\192.168.1.207\\c$\\Users\\Artur\\Downloads\\Udostępnione\\Zdjęcia\\";
-    private final String FOLDER_PATH = configDTO.getConfig().get("rootFolder").toString();
+    private String FOLDER_PATH = configDTO.getConfig().get("rootFolder").toString();
+
+    //get this value from application.properties
+    @Value("${server.port}")
+    int serverPort;
+
+    String localIp = InetAddress.getLocalHost().getHostAddress();
 
     @Autowired
     ExplorerService explorerService;
@@ -51,9 +60,14 @@ public class ExplorerController {
             Path path = Paths.get(relative);
             Path parent = path.getParent();
             mv.getModel().put("parent", parent);
-            System.out.println("Parent: "+parent);
-            System.out.println("Relative: "+relative);
+            //System.out.println(localIp);
+            //System.out.println("Parent: "+parent);
+            //System.out.println("Relative: "+relative);
             mv.getModel().put("relative", relative);
+        }
+        else
+        {
+            mv.getModel().put("ipInfo", "Access address: "+localIp+":"+serverPort+"\\home");
         }
 
         System.out.println("Relative path: "+relative);
@@ -77,7 +91,8 @@ public class ExplorerController {
     @GetMapping(value = "/get-file" /*produces = MediaType.APPLICATION_OCTET_STREAM_VALUE*/)
     public @ResponseBody ResponseEntity<Resource> downloadFile(@RequestParam(required = false) String relative) throws IOException {
 
-        File file = new File("c:\\Users\\Artur\\Downloads\\Udostępnione\\Zdjęcia\\"+relative);
+        //File file = new File("c:\\Users\\Artur\\Downloads\\Udostępnione\\Zdjęcia\\"+relative);
+        File file = new File(FOLDER_PATH+relative);
         Path path = Paths.get(file.getAbsolutePath());
         ByteArrayResource resource = new ByteArrayResource(Files.readAllBytes(path));
 
